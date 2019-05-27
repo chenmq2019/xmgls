@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>手册</title>
+    <script src="./libs/xlsx.full.min.js"></script>
+</head>
+<body>
+		<header class="mui-bar mui-bar-nav">
+			<h1 class="mui-title">项目管理室手册</h1>
+		</header>
+		
+		<button type="button" class="mui-btn mui-btn-success mui-btn-block" onclick="document.getElementById('uploadBtn').click()">手册加载开始</button>
+		
+		<!-- 文件上传隐藏input -->
+		<input style="display: none;" type="file" id="uploadBtn" onchange="importf(this)" value="./data/data.xlsx"/>
+		
+		<script>
+			
+			/**
+         * FileReader共有4种读取方法：
+         * 1.readAsArrayBuffer(file)：将文件读取为ArrayBuffer。
+         * 2.readAsBinaryString(file)：将文件读取为二进制字符串
+         * 3.readAsDataURL(file)：将文件读取为Data URL
+         * 4.readAsText(file, [encoding])：将文件读取为文本，encoding缺省值为'UTF-8'
+         */
+       
+        //开始导入
+        function importf(obj) {
+					var wb;//读取完成的数据
+					if(!obj.files) {
+                return;
+            }
+						var f = obj.files[0];
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var data = e.target.result;
+								wb = XLSX.read(data, {
+									type: 'binary'
+									});
+                /**
+                 * wb.SheetNames[0]是获取Sheets中第一个Sheet的名字
+                 * wb.Sheets[Sheet名]获取第一个Sheet的数据
+                 */
+				//取出值
+            var data = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
+			
+			console.log(data);
+				
+			//整理数据
+			var noPic = [];
+			var yesPic = [];
+			for(i=0; i<data.length; i++){
+				console.log(data[i]);
+				noPic.push([data[i].picExpNo,data[i].picNameNo]);
+				yesPic.push([data[i].picExpYes,data[i].picNameYes]);
+			}
+			
+			
+			//存session
+			sessionStorage.setItem("noPic", noPic.join('-'));
+			sessionStorage.setItem("yesPic", yesPic.join('-'));
+           };
+					 
+			reader.readAsBinaryString(f);
+			
+			window.location.href="./handbook_fk.html";
+        }
+		
+		//其实就是跳页面
+		function showPic(){
+			window.location.href="./handbook_fk.html";
+		}
+		
+		</script>
+	</body>
+</html>

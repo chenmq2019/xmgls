@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>项目管理室</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<!--标准mui.css-->
+		<link rel="stylesheet" href="./css/mui.min.css">
+		<style>
+			.chart {
+				height: 450px;
+				margin: 0px;
+				padding: 0px;
+			}
+			h5 {
+				margin-top: 30px;
+				font-weight: bold;
+			}
+			h5:first-child {
+				margin-top: 15px;
+			}
+		</style>
+		<script src="./js/mui.min.js"></script>
+		<script src="./libs/echarts-all.js"></script>
+		<script src="./libs/xlsx.full.min.js"></script>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<h1 class="mui-title">项目管理室</h1>
+			<button class="mui-btn mui-btn-blue mui-btn-link mui-pull-right mui-hidden" onclick="document.getElementById('uploadBtn').click()">换一个</button>
+		</header>
+		<div class="mui-content">
+			<div class="mui-content-padded">
+				<p id='exp' style="text-indent: 22px;">
+					五月份以来，项目管理室共计审核付款材料39份。 
+					<br />
+					下图是项目管理室5月份材料检查常见错误分布。
+				</p>
+			</div>
+			<div id='pieShow' class="mui-content-padded">
+				<h5 id='expPie'></h5>
+				<div class="chart" id="pieChart"></div>
+				
+				<div id="excelContent"></div>
+			</div>
+		</div>
+		<button id="nest" type="button" class="mui-btn mui-btn-success mui-btn-block" >查看图示</button>
+		
+		<!-- 文件上传隐藏input -->
+		<input class="mui-hidden" type="file" id="uploadBtn" onchange="importf(this)" value="./data/data.xlsx"/>
+		
+		<script>
+			
+			//简单取ID
+			var byId = function(id) {
+				return document.getElementById(id);
+			};
+			
+			//生成饼图
+			var pieChart = echarts.init(byId('pieChart'));
+			pieChart.setOption({
+					calculable: true,
+					legend: { 
+//						orient: 'vertical', 
+						left: 'left', 
+						data: ['审核意见表出错',
+						'工作报告错误',
+						'领导签字',
+						'材料缺失',
+						'发票缺背书',
+						'合同扫描件未签字']
+					},
+					series: [{
+						name: '5月份付款材料常见错误分布',
+						type: 'pie',
+						radius: '60%',//65
+//						center: ['50%', '50%'],
+						data: [{
+							value: 7,
+							name: '审核意见表出错'
+						}, {
+							value: 6,
+							name: '工作报告错误'
+						}, {
+							value: 8,
+							name: '领导签字'
+						}, {
+							value: 20,
+							name: '材料缺失'
+						}, {
+							value: 15,
+							name: '发票缺背书'
+						}, {
+							value: 11,
+							name: '合同扫描件未签字'
+						}]
+					}]
+				});
+			
+			/**
+         * FileReader共有4种读取方法：
+         * 1.readAsArrayBuffer(file)：将文件读取为ArrayBuffer。
+         * 2.readAsBinaryString(file)：将文件读取为二进制字符串
+         * 3.readAsDataURL(file)：将文件读取为Data URL
+         * 4.readAsText(file, [encoding])：将文件读取为文本，encoding缺省值为'UTF-8'
+         */
+       
+        //开始导入
+        function importf(obj) {
+					var wb;//读取完成的数据
+					if(!obj.files) {
+                return;
+            }
+						var f = obj.files[0];
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var data = e.target.result;
+								wb = XLSX.read(data, {
+									type: 'binary'
+									});
+                /**
+                 * wb.SheetNames[0]是获取Sheets中第一个Sheet的名字
+                 * wb.Sheets[Sheet名]获取第一个Sheet的数据
+                 */
+            var excelJson = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
+						//取出值
+						console.log(excelJson);
+				
+						//整理数据
+						
+				
+           };
+					 
+					 reader.readAsBinaryString(f);
+        }
+		
+		//其实就是跳页面
+		document.getElementById("nest").addEventListener("tap", function(){
+			window.location.href="./showpicDef.html";
+		});
+		
+//		var data = sessionStorage.getItem("noPic").split('-');
+//		console.log(data);
+		</script>
+	</body>
+
+</html>
